@@ -1,0 +1,318 @@
+
+<div class="budgets-page">
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div>
+      <span class="eyebrow">PERSONAL FINANCE</span>
+      <h1>Budget Management</h1>
+      <p>Plan your monthly spending and manage your budget limits.</p>
+    </div>
+
+    <button
+      class="add-budget-btn"
+      (click)="openAddForm()">
+      <span class="plus-icon">+</span>
+      Create Budget
+    </button>
+  </header>
+
+  <!-- Success Message -->
+  @if (successMessage) {
+    <div class="alert success-alert">
+      <span class="alert-icon">✓</span>
+      {{ successMessage }}
+    </div>
+  }
+
+  <!-- Error Message -->
+  @if (errorMessage) {
+    <div class="alert error-alert">
+      <span class="alert-icon">!</span>
+      {{ errorMessage }}
+    </div>
+  }
+
+  <!-- Summary Cards -->
+  <section class="summary-grid">
+
+    <article class="summary-card">
+      <div class="summary-icon budget-icon">₹</div>
+      <div>
+        <p>Total Planned Budget</p>
+        <h2>{{ totalBudgetAmount | currency:'INR':'symbol':'1.0-2':'en-IN' }}</h2>
+        <span>Sum of saved budget limits</span>
+      </div>
+    </article>
+
+    <article class="summary-card">
+      <div class="summary-icon count-icon">▤</div>
+      <div>
+        <p>Budgets Created</p>
+        <h2>{{ totalBudgets }}</h2>
+        <span>Monthly budget records</span>
+      </div>
+    </article>
+
+  </section>
+
+  <!-- Budget List -->
+  <section class="budget-section">
+
+    <div class="section-header">
+      <div>
+        <h2>Your Monthly Budgets</h2>
+        <p>Manage the spending limits you have set for each month.</p>
+      </div>
+
+      <button
+        class="refresh-btn"
+        (click)="loadBudgets()"
+        [disabled]="isLoading">
+        ↻ Refresh
+      </button>
+    </div>
+
+    @if (isLoading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading budgets...</p>
+      </div>
+    } @else {
+
+      @if (budgets.length > 0) {
+
+        <div class="budget-grid">
+
+          @for (budget of budgets; track budget.budgetId) {
+
+            <article class="budget-card">
+
+              <div class="budget-card-top">
+                <div class="calendar-icon">
+                  <span class="calendar-month">
+                    {{ getMonthName(budget.month).substring(0, 3) }}
+                  </span>
+                  <span class="calendar-year">
+                    {{ budget.year }}
+                  </span>
+                </div>
+
+                <span class="budget-status">
+                  Planned
+                </span>
+              </div>
+
+              <div class="budget-details">
+                <p class="budget-label">Monthly Budget Limit</p>
+
+                <h3>
+                  {{ budget.monthlyLimit | currency:'INR':'symbol':'1.0-2':'en-IN' }}
+                </h3>
+
+                <p class="budget-period">
+                  {{ getMonthName(budget.month) }} {{ budget.year }}
+                </p>
+              </div>
+
+              <div class="budget-card-footer">
+
+                <button
+                  class="edit-btn"
+                  (click)="editBudget(budget)">
+                  <span>✎</span>
+                  Edit
+                </button>
+
+                <button
+                  class="delete-btn"
+                  (click)="deleteBudget(budget)"
+                  [disabled]="isDeleting">
+                  <span>⌫</span>
+                  Delete
+                </button>
+
+              </div>
+
+            </article>
+
+          }
+
+        </div>
+
+      } @else {
+
+        <div class="empty-state">
+          <div class="empty-icon">₹</div>
+
+          <h3>No budgets created yet</h3>
+
+          <p>
+            Start planning your finances by creating your first monthly budget.
+          </p>
+
+          <button
+            class="add-budget-btn"
+            (click)="openAddForm()">
+            + Create Your First Budget
+          </button>
+        </div>
+
+      }
+
+    }
+
+  </section>
+
+</div>
+
+
+<!-- Create / Edit Budget Modal -->
+@if (showForm) {
+
+  <div class="modal-overlay" (click)="closeForm()">
+
+    <div
+      class="budget-modal"
+      (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+
+        <div>
+          <span class="eyebrow">BUDGET SETTINGS</span>
+
+          <h2>
+            {{ isEditing ? 'Update Budget' : 'Create New Budget' }}
+          </h2>
+
+          <p>
+            {{
+              isEditing
+                ? 'Update your monthly spending limit.'
+                : 'Set a spending limit for a particular month.'
+            }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="close-btn"
+          (click)="closeForm()">
+          ×
+        </button>
+
+      </div>
+
+      <form
+        [formGroup]="budgetForm"
+        (ngSubmit)="submitBudget()"
+        novalidate>
+
+        <!-- Monthly Limit -->
+        <div class="form-group">
+
+          <label for="monthlyLimit">
+            Monthly Budget Limit
+          </label>
+
+          <div class="amount-input-wrapper">
+            <span class="currency-symbol">₹</span>
+
+            <input
+              id="monthlyLimit"
+              type="number"
+              formControlName="monthlyLimit"
+              placeholder="Enter your budget amount"
+              min="0.01"
+              step="0.01">
+          </div>
+
+          @if (
+            budgetForm.controls.monthlyLimit.touched &&
+            budgetForm.controls.monthlyLimit.invalid
+          ) {
+            <small class="field-error">
+              Please enter a valid amount greater than zero.
+            </small>
+          }
+
+        </div>
+
+        <!-- Month -->
+        <div class="form-group">
+
+          <label for="month">Month</label>
+
+          <select
+            id="month"
+            formControlName="month">
+
+            @for (month of months; track month.value) {
+              <option [ngValue]="month.value">
+                {{ month.name }}
+              </option>
+            }
+
+          </select>
+
+        </div>
+
+        <!-- Year -->
+        <div class="form-group">
+
+          <label for="year">Year</label>
+
+          <select
+            id="year"
+            formControlName="year">
+
+            @for (year of years; track year) {
+              <option [ngValue]="year">
+                {{ year }}
+              </option>
+            }
+
+          </select>
+
+        </div>
+
+        @if (isEditing) {
+          <p class="edit-note">
+            Month and year cannot be changed while editing a budget.
+          </p>
+        }
+
+        <!-- Form Buttons -->
+        <div class="modal-actions">
+
+          <button
+            type="button"
+            class="cancel-btn"
+            (click)="closeForm()"
+            [disabled]="isSaving">
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            class="submit-btn"
+            [disabled]="isSaving">
+
+            @if (isSaving) {
+              <span class="button-spinner"></span>
+              Saving...
+            } @else {
+              {{ isEditing ? 'Update Budget' : 'Create Budget' }}
+            }
+
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+}

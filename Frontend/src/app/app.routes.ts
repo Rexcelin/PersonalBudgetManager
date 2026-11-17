@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 
 import { Transactions } from './features/transactions/transactions/transactions';
 
+import { Budgets } from './features/budgets/budgets/budgets';
+
 export const routes: Routes = [
   {
     path: '',
@@ -23,6 +25,10 @@ export const routes: Routes = [
   {
     path: 'transactions',
     component: Transactions,
+  },
+  {
+    path: 'budgets',
+    component: Budgets,
   },
   {
     path: '**',
