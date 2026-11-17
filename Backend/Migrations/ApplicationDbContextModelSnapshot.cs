@@ -225,6 +225,35 @@ namespace PersonalBudgetManager.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("PersonalBudgetManager.Models.Budget", b =>
+                {
+                    b.Property<int>("BudgetId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BudgetId"));
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("MonthlyLimit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("BudgetId");
+
+                    b.HasIndex("UserId", "Month", "Year")
+                        .IsUnique();
+
+                    b.ToTable("Budgets");
+                });
+
             modelBuilder.Entity("PersonalBudgetManager.Models.Transaction", b =>
                 {
                     b.Property<int>("TransactionId")
@@ -310,6 +339,15 @@ namespace PersonalBudgetManager.Migrations
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("PersonalBudgetManager.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PersonalBudgetManager.Models.Budget", b =>
                 {
                     b.HasOne("PersonalBudgetManager.Models.ApplicationUser", null)
                         .WithMany()

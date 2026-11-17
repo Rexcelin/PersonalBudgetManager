@@ -86,6 +86,9 @@ builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 
+builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AngularFrontend", policy =>
