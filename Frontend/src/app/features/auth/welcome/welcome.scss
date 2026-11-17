@@ -102,3 +102,20 @@ h1 {
     padding: 30px 22px;
   }
 }
+
+.transactions-link {
+  display: inline-block;
+  padding: 12px 20px;
+  margin-top: 15px;
+  background: #214c39;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: 0.2s ease;
+
+  &:hover {
+    background: #79a83f;
+    color: #173c2f;
+  }
+}

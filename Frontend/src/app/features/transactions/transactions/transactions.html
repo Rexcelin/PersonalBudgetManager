@@ -1,0 +1,470 @@
+
+<div class="transactions-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+
+    <div>
+      <span class="eyebrow">PERSONAL FINANCE</span>
+
+      <h1>Transactions</h1>
+
+      <p>Track and manage your income and expenses.</p>
+    </div>
+
+    <button class="add-button" (click)="openAddForm()">
+      <span>+</span>
+      Add Transaction
+    </button>
+
+  </div>
+
+  <!-- Messages -->
+  @if (successMessage) {
+    <div class="alert success-alert">
+      {{ successMessage }}
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="alert error-alert">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <!-- Summary Cards -->
+  <div class="summary-grid">
+
+    <div class="summary-card balance-card">
+
+      <div class="summary-top">
+        <span class="summary-label">Total Balance</span>
+        <span class="summary-icon">◈</span>
+      </div>
+
+      <h2>{{ balance | currency:'INR':'symbol':'1.2-2' }}</h2>
+
+      <p>Income minus expenses</p>
+
+    </div>
+
+    <div class="summary-card income-card">
+
+      <div class="summary-top">
+        <span class="summary-label">Total Income</span>
+        <span class="summary-icon">↗</span>
+      </div>
+
+      <h2>{{ totalIncome | currency:'INR':'symbol':'1.2-2' }}</h2>
+
+      <p>Money received</p>
+
+    </div>
+
+    <div class="summary-card expense-card">
+
+      <div class="summary-top">
+        <span class="summary-label">Total Expenses</span>
+        <span class="summary-icon">↘</span>
+      </div>
+
+      <h2>{{ totalExpense | currency:'INR':'symbol':'1.2-2' }}</h2>
+
+      <p>Money spent</p>
+
+    </div>
+
+  </div>
+
+  <!-- Transactions Section -->
+  <section class="transactions-section">
+
+    <div class="section-header">
+
+      <div>
+        <h2>Recent Transactions</h2>
+        <p>View and manage your financial activities.</p>
+      </div>
+
+      <button
+        class="refresh-button"
+        (click)="loadTransactions()"
+        [disabled]="isLoading">
+        ↻ Refresh
+      </button>
+
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-row">
+
+      <div class="filter-buttons">
+
+        <button
+          [class.active]="selectedFilter === 'All'"
+          (click)="changeFilter('All')">
+          All
+        </button>
+
+        <button
+          [class.active]="selectedFilter === 'Income'"
+          (click)="changeFilter('Income')">
+          Income
+        </button>
+
+        <button
+          [class.active]="selectedFilter === 'Expense'"
+          (click)="changeFilter('Expense')">
+          Expenses
+        </button>
+
+      </div>
+
+      <span class="transaction-count">
+        {{ filteredTransactions.length }} transactions
+      </span>
+
+    </div>
+
+    <!-- Loading -->
+    @if (isLoading) {
+
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading transactions...</p>
+      </div>
+
+    } @else {
+
+      <!-- Transaction Table -->
+      @if (filteredTransactions.length > 0) {
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>TRANSACTION</th>
+                <th>CATEGORY</th>
+                <th>DATE</th>
+                <th>TYPE</th>
+                <th>AMOUNT</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              @for (transaction of filteredTransactions;
+                    track transaction.transactionId) {
+
+                <tr>
+
+                  <td>
+                    <div class="transaction-title">
+                      <div
+                        class="transaction-icon"
+                        [class.income-icon]="transaction.type === 'Income'"
+                        [class.expense-icon]="transaction.type === 'Expense'">
+
+                        {{ transaction.type === 'Income' ? '↗' : '↘' }}
+
+                      </div>
+
+                      <div class="transaction-info">
+                        <strong>{{ transaction.title }}</strong>
+
+                        @if (transaction.description) {
+                          <small>{{ transaction.description }}</small>
+                        }
+                      </div>
+                    </div>
+                  </td>
+
+                  <td>
+                    <span class="category-badge">
+                      {{ transaction.category }}
+                    </span>
+                  </td>
+
+                  <td>
+                    {{ transaction.transactionDate | date:'dd MMM yyyy' }}
+                  </td>
+
+                  <td>
+                    <span
+                      class="type-badge"
+                      [class.income-badge]="transaction.type === 'Income'"
+                      [class.expense-badge]="transaction.type === 'Expense'">
+
+                      {{ transaction.type }}
+
+                    </span>
+                  </td>
+
+                  <td>
+                    <strong
+                      class="amount"
+                      [class.income-amount]="transaction.type === 'Income'"
+                      [class.expense-amount]="transaction.type === 'Expense'">
+
+                      {{ transaction.type === 'Income' ? '+' : '-' }}
+                      {{ transaction.amount | currency:'INR':'symbol':'1.2-2' }}
+
+                    </strong>
+                  </td>
+
+                  <td>
+                    <div class="action-buttons">
+
+                      <button
+                        class="edit-button"
+                        (click)="editTransaction(transaction)"
+                        title="Edit transaction">
+                        Edit
+                      </button>
+
+                      <button
+                        class="delete-button"
+                        (click)="deleteTransaction(transaction)"
+                        title="Delete transaction">
+                        Delete
+                      </button>
+
+                    </div>
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      } @else {
+
+        <div class="empty-state">
+
+          <div class="empty-icon">◈</div>
+
+          <h3>No transactions found</h3>
+
+          @if (selectedFilter === 'All') {
+            <p>Start tracking your money by adding your first transaction.</p>
+          } @else {
+            <p>No {{ selectedFilter.toLowerCase() }} transactions are available.</p>
+          }
+
+          <button class="add-button" (click)="openAddForm()">
+            + Add Transaction
+          </button>
+
+        </div>
+
+      }
+
+    }
+
+  </section>
+
+</div>
+
+
+<!-- Add / Edit Transaction Modal -->
+@if (showForm) {
+
+  <div class="modal-backdrop" (click)="closeForm()">
+
+    <div
+      class="transaction-modal"
+      (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+
+        <div>
+          <span class="eyebrow">TRANSACTION DETAILS</span>
+
+          <h2>
+            {{ isEditing ? 'Edit Transaction' : 'Add Transaction' }}
+          </h2>
+        </div>
+
+        <button
+          class="close-button"
+          type="button"
+          (click)="closeForm()">
+          ×
+        </button>
+
+      </div>
+
+      <form
+        [formGroup]="transactionForm"
+        (ngSubmit)="submitTransaction()">
+
+        <!-- Title -->
+        <div class="form-group">
+
+          <label for="title">Transaction Title</label>
+
+          <input
+            id="title"
+            type="text"
+            formControlName="title"
+            placeholder="Example: Monthly Salary">
+
+          @if (
+            transactionForm.controls.title.touched &&
+            transactionForm.controls.title.invalid
+          ) {
+            <small class="validation-error">
+              Please enter a title (maximum 100 characters).
+            </small>
+          }
+
+        </div>
+
+        <!-- Amount -->
+        <div class="form-group">
+
+          <label for="amount">Amount (₹)</label>
+
+          <input
+            id="amount"
+            type="number"
+            formControlName="amount"
+            min="0.01"
+            step="0.01"
+            placeholder="Enter amount">
+
+          @if (
+            transactionForm.controls.amount.touched &&
+            transactionForm.controls.amount.invalid
+          ) {
+            <small class="validation-error">
+              Amount must be greater than zero.
+            </small>
+          }
+
+        </div>
+
+        <!-- Type -->
+        <div class="form-group">
+
+          <label for="type">Transaction Type</label>
+
+          <select id="type" formControlName="type">
+
+            <option value="Income">Income</option>
+            <option value="Expense">Expense</option>
+
+          </select>
+
+        </div>
+
+        <!-- Category -->
+        <div class="form-group">
+
+          <label for="category">Category</label>
+
+          <input
+            id="category"
+            type="text"
+            formControlName="category"
+            placeholder="Example: Food, Salary, Travel">
+
+          @if (
+            transactionForm.controls.category.touched &&
+            transactionForm.controls.category.invalid
+          ) {
+            <small class="validation-error">
+              Please enter a category (maximum 50 characters).
+            </small>
+          }
+
+        </div>
+
+        <!-- Date -->
+        <div class="form-group">
+
+          <label for="transactionDate">Transaction Date</label>
+
+          <input
+            id="transactionDate"
+            type="date"
+            formControlName="transactionDate">
+
+          @if (
+            transactionForm.controls.transactionDate.touched &&
+            transactionForm.controls.transactionDate.invalid
+          ) {
+            <small class="validation-error">
+              Please select a transaction date.
+            </small>
+          }
+
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+
+          <label for="description">
+            Description <span>(Optional)</span>
+          </label>
+
+          <textarea
+            id="description"
+            rows="3"
+            formControlName="description"
+            placeholder="Add additional details...">
+          </textarea>
+
+          @if (
+            transactionForm.controls.description.touched &&
+            transactionForm.controls.description.invalid
+          ) {
+            <small class="validation-error">
+              Description cannot exceed 500 characters.
+            </small>
+          }
+
+        </div>
+
+        <!-- Form Actions -->
+        <div class="modal-actions">
+
+          <button
+            type="button"
+            class="cancel-button"
+            (click)="closeForm()">
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            class="submit-button"
+            [disabled]="isSaving">
+
+            {{
+              isSaving
+                ? 'Saving...'
+                : isEditing
+                  ? 'Update Transaction'
+                  : 'Save Transaction'
+            }}
+
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+}

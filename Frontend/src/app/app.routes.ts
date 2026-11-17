@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 
+import { Transactions } from './features/transactions/transactions/transactions';
+
 export const routes: Routes = [
   {
     path: '',
@@ -17,6 +19,10 @@ export const routes: Routes = [
   {
     path: 'welcome',
     loadComponent: () => import('./features/auth/welcome/welcome').then((m) => m.Welcome),
+  },
+  {
+    path: 'transactions',
+    component: Transactions,
   },
   {
     path: '**',
