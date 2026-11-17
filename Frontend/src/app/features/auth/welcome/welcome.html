@@ -1,0 +1,37 @@
+
+<div class="welcome-page">
+  <div class="welcome-card">
+
+    <div class="brand-icon">₹</div>
+
+    <p class="eyebrow">PERSONAL BUDGET MANAGER</p>
+
+    <h1>Welcome, {{ user?.fullName }}!</h1>
+
+    <p class="description">
+      Your account has been successfully authenticated.
+      You're ready to take control of your finances.
+    </p>
+
+    <div class="user-details">
+      <div>
+        <span>Full name</span>
+        <strong>{{ user?.fullName }}</strong>
+      </div>
+
+      <div>
+        <span>Email address</span>
+        <strong>{{ user?.email }}</strong>
+      </div>
+    </div>
+
+    <p class="coming-soon">
+      Your financial dashboard will be implemented in the next development phase.
+    </p>
+
+    <button class="logout-button" (click)="logout()">
+      Logout
+    </button>
+
+  </div>
+</div>
