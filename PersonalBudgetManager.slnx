@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/Backend/">
+    <Project Path="Backend/PersonalBudgetManager.csproj" />
+  </Folder>
+</Solution>
