@@ -13,6 +13,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
     }
 
+    public DbSet<Transaction> Transactions { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -21,5 +23,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .Property(user => user.FullName)
             .IsRequired()
             .HasMaxLength(100);
+
+        builder.Entity<Transaction>()
+            .HasOne<ApplicationUser>()
+            .WithMany()
+            .HasForeignKey(transaction => transaction.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -7,6 +7,8 @@ using PersonalBudgetManager.Data;
 using PersonalBudgetManager.Models;
 using PersonalBudgetManager.Services.Interfaces;
 using PersonalBudgetManager.Services.Implementations;
+using PersonalBudgetManager.Repositories.Interfaces;
+using PersonalBudgetManager.Repositories.Implementations;
 using Scalar.AspNetCore;
 
 
@@ -79,6 +81,10 @@ builder.Services.AddOpenApi();
 
 // Register Authentication Service
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+
+builder.Services.AddScoped<ITransactionService, TransactionService>();
 
 builder.Services.AddCors(options =>
 {
