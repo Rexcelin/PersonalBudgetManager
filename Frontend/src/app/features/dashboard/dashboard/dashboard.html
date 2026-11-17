@@ -1,0 +1,394 @@
+
+<div class="dashboard-page">
+
+<div style="background: yellow; padding: 10px; color: black;">
+  Loading State: {{ isLoading }}
+
+  Dashboard Data Exists: {{ dashboard !== null }}
+
+  Error: {{ errorMessage }}
+</div>
+
+  <!-- Page Header -->
+  <div class="dashboard-header">
+    <div>
+      <span class="page-label">OVERVIEW</span>
+      <h1>Dashboard</h1>
+      <p>Welcome back! Here's your financial overview.</p>
+    </div>
+
+    <div class="header-actions">
+      <span class="current-date">
+        {{ currentMonthName }}
+      </span>
+
+      <button
+        class="refresh-btn"
+        type="button"
+        (click)="loadDashboard()"
+        [disabled]="isLoading">
+        <span [class.rotating]="isLoading">↻</span>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div class="alert error-alert" *ngIf="errorMessage">
+    <span>{{ errorMessage }}</span>
+    <button type="button" (click)="loadDashboard()">Try Again</button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading && !dashboard">
+    <div class="loader"></div>
+    <p>Loading your financial dashboard...</p>
+  </div>
+
+  <!-- Dashboard Content -->
+  <ng-container *ngIf="dashboard as data">
+
+    <!-- Overall Financial Summary -->
+    <section class="summary-section">
+
+      <div class="summary-card income-card">
+        <div class="summary-top">
+          <div class="summary-icon income-icon">↗</div>
+          <span class="summary-label">Total Income</span>
+        </div>
+
+        <h2>{{ data.totalIncome | currency:'INR':'symbol':'1.2-2' }}</h2>
+        <p>All recorded income</p>
+      </div>
+
+      <div class="summary-card expense-card">
+        <div class="summary-top">
+          <div class="summary-icon expense-icon">↘</div>
+          <span class="summary-label">Total Expenses</span>
+        </div>
+
+        <h2>{{ data.totalExpenses | currency:'INR':'symbol':'1.2-2' }}</h2>
+        <p>All recorded expenses</p>
+      </div>
+
+      <div class="summary-card balance-card">
+        <div class="summary-top">
+          <div class="summary-icon balance-icon">₹</div>
+          <span class="summary-label">Available Balance</span>
+        </div>
+
+        <h2>{{ data.balance | currency:'INR':'symbol':'1.2-2' }}</h2>
+        <p>Total income minus expenses</p>
+      </div>
+
+    </section>
+
+    <!-- Current Month -->
+    <div class="section-heading">
+      <div>
+        <h2>Monthly Overview</h2>
+        <p>Your financial activity for {{ currentMonthName }}</p>
+      </div>
+    </div>
+
+    <section class="monthly-overview">
+
+      <div class="month-card">
+        <div class="month-card-heading">
+          <div class="month-icon income-icon">↗</div>
+          <span>Monthly Income</span>
+        </div>
+
+        <h3>{{ data.currentMonthIncome | currency:'INR':'symbol':'1.2-2' }}</h3>
+        <p>Income received this month</p>
+      </div>
+
+      <div class="month-card">
+        <div class="month-card-heading">
+          <div class="month-icon expense-icon">↘</div>
+          <span>Monthly Expenses</span>
+        </div>
+
+        <h3>{{ data.currentMonthExpenses | currency:'INR':'symbol':'1.2-2' }}</h3>
+        <p>Expenses recorded this month</p>
+      </div>
+
+    </section>
+
+    <!-- Budget Overview -->
+    <div class="section-heading">
+      <div>
+        <h2>Budget Overview</h2>
+        <p>Track your monthly spending limit</p>
+      </div>
+    </div>
+
+    <section class="budget-section">
+
+      <ng-container *ngIf="data.currentMonthBudget as budget">
+
+        <div class="budget-top">
+          <div>
+            <span class="budget-label">Monthly Budget</span>
+            <h3>{{ budget.monthlyLimit | currency:'INR':'symbol':'1.2-2' }}</h3>
+          </div>
+
+          <span
+            class="budget-status"
+            [class.over-budget]="budget.isOverBudget">
+            {{ budget.isOverBudget ? 'Over Budget' : 'Within Budget' }}
+          </span>
+        </div>
+
+        <div class="budget-progress-info">
+          <span>
+            Spent:
+            <strong>{{ budget.amountSpent | currency:'INR':'symbol':'1.2-2' }}</strong>
+          </span>
+
+          <span>
+            {{ budget.usagePercentage | number:'1.0-2' }}%
+          </span>
+        </div>
+
+        <div class="progress-track">
+          <div
+            class="progress-fill"
+            [class.progress-danger]="budget.isOverBudget"
+            [style.width.%]="getBudgetProgress()">
+          </div>
+        </div>
+
+        <div class="budget-bottom">
+          <span>
+            {{ budget.isOverBudget ? 'Over budget by' : 'Remaining' }}
+          </span>
+
+          <strong [class.negative-amount]="budget.isOverBudget">
+            {{ (budget.isOverBudget
+              ? -budget.remainingAmount
+              : budget.remainingAmount)
+              | currency:'INR':'symbol':'1.2-2' }}
+          </strong>
+        </div>
+
+      </ng-container>
+
+      <div class="no-budget" *ngIf="!data.currentMonthBudget">
+        <div class="no-budget-icon">₹</div>
+        <h3>No budget created for this month</h3>
+        <p>Create a monthly budget to monitor your spending.</p>
+        <a routerLink="/budgets" class="budget-link">
+          Create Budget
+        </a>
+      </div>
+
+    </section>
+
+    <!-- Monthly Chart -->
+    <div class="section-heading">
+      <div>
+        <h2>Income vs Expenses</h2>
+        <p>Monthly comparison for the last six months</p>
+      </div>
+
+      <div class="chart-legend">
+        <span><i class="legend-income"></i> Income</span>
+        <span><i class="legend-expense"></i> Expenses</span>
+      </div>
+    </div>
+
+    <section class="chart-section">
+
+      <div class="chart-y-label">
+        <span>Amount (₹)</span>
+      </div>
+
+      <div class="chart-area">
+
+        <div class="chart-grid">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <div class="chart-columns">
+
+          <div
+            class="chart-column"
+            *ngFor="let month of data.monthlySummaries">
+
+            <div class="bar-group">
+
+              <div class="bar-wrapper">
+                <div
+                  class="chart-bar income-bar"
+                  [style.height.%]="getIncomeBarHeight(month.income)"
+                  [title]="'Income: ' + (month.income | currency:'INR')">
+                </div>
+              </div>
+
+              <div class="bar-wrapper">
+                <div
+                  class="chart-bar expense-bar"
+                  [style.height.%]="getExpenseBarHeight(month.expenses)"
+                  [title]="'Expenses: ' + (month.expenses | currency:'INR')">
+                </div>
+              </div>
+
+            </div>
+
+            <span class="month-label">
+              {{ month.monthName.substring(0, 3) }}
+              {{ month.year }}
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- Category Expenses -->
+    <div class="section-heading">
+      <div>
+        <h2>Category-wise Expenses</h2>
+        <p>Where your money is being spent this month</p>
+      </div>
+    </div>
+
+    <section class="category-section">
+
+      <ng-container *ngIf="data.categoryExpenses.length > 0; else noCategories">
+
+        <div
+          class="category-row"
+          *ngFor="let category of data.categoryExpenses; trackBy: trackByCategory">
+
+          <div class="category-details">
+            <div>
+              <h4>{{ category.category }}</h4>
+              <span>{{ getCategoryPercentage(category.amount) | number:'1.0-1' }}% of expenses</span>
+            </div>
+
+            <strong>
+              {{ category.amount | currency:'INR':'symbol':'1.2-2' }}
+            </strong>
+          </div>
+
+          <div class="category-progress">
+            <div
+              class="category-progress-fill"
+              [style.width.%]="getCategoryPercentage(category.amount)">
+            </div>
+          </div>
+
+        </div>
+
+      </ng-container>
+
+      <ng-template #noCategories>
+        <div class="empty-state">
+          <div class="empty-icon">◷</div>
+          <h3>No expenses recorded</h3>
+          <p>Your current-month expense categories will appear here.</p>
+        </div>
+      </ng-template>
+
+    </section>
+
+    <!-- Recent Transactions -->
+    <div class="section-heading recent-heading">
+      <div>
+        <h2>Recent Transactions</h2>
+        <p>Your latest five financial transactions</p>
+      </div>
+
+      <a routerLink="/transactions" class="view-all-link">
+        View All →
+      </a>
+    </div>
+
+    <section class="recent-section">
+
+      <div class="table-responsive" *ngIf="data.recentTransactions.length > 0; else noTransactions">
+
+        <table>
+          <thead>
+            <tr>
+              <th>Transaction</th>
+              <th>Category</th>
+              <th>Date</th>
+              <th>Type</th>
+              <th class="amount-column">Amount</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr
+              *ngFor="let transaction of data.recentTransactions; trackBy: trackByTransaction">
+
+              <td>
+                <div class="transaction-title">
+                  <span
+                    class="transaction-indicator"
+                    [class.income-indicator]="transaction.type === 'Income'"
+                    [class.expense-indicator]="transaction.type === 'Expense'">
+                  </span>
+
+                  <div>
+                    <strong>{{ transaction.title }}</strong>
+                    <small>{{ transaction.description || 'No description' }}</small>
+                  </div>
+                </div>
+              </td>
+
+              <td>{{ transaction.category }}</td>
+
+              <td>
+                {{ transaction.transactionDate | date:'dd MMM yyyy' }}
+              </td>
+
+              <td>
+                <span
+                  class="type-badge"
+                  [class.income-badge]="transaction.type === 'Income'"
+                  [class.expense-badge]="transaction.type === 'Expense'">
+                  {{ transaction.type }}
+                </span>
+              </td>
+
+              <td class="amount-column">
+                <strong
+                  [class.income-text]="transaction.type === 'Income'"
+                  [class.expense-text]="transaction.type === 'Expense'">
+                  {{ transaction.type === 'Income' ? '+' : '-' }}
+                  {{ transaction.amount | currency:'INR':'symbol':'1.2-2' }}
+                </strong>
+              </td>
+
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+      <ng-template #noTransactions>
+        <div class="empty-state">
+          <div class="empty-icon">₹</div>
+          <h3>No transactions yet</h3>
+          <p>Add your first transaction to see it here.</p>
+          <a routerLink="/transactions" class="budget-link">
+            Add Transaction
+          </a>
+        </div>
+      </ng-template>
+
+    </section>
+
+  </ng-container>
+
+</div>

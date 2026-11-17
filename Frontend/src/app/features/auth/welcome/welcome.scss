@@ -1,4 +1,8 @@
 
+/* ================================
+   Welcome Page
+================================ */
+
 .welcome-page {
   min-height: 100vh;
   display: grid;
@@ -7,28 +11,34 @@
   background: #f3f6f1;
 }
 
+/* Main Card */
+
 .welcome-card {
   width: 100%;
-  max-width: 520px;
-  padding: 45px;
-  background: white;
+  max-width: 540px;
+  padding: 42px;
+  background: #ffffff;
   border: 1px solid #e6ebe2;
   border-radius: 20px;
   text-align: center;
   box-shadow: 0 15px 45px rgba(24, 49, 34, 0.08);
 }
 
+/* Brand Icon */
+
 .brand-icon {
-  width: 58px;
-  height: 58px;
+  width: 60px;
+  height: 60px;
   display: grid;
   place-items: center;
-  margin: 0 auto 24px;
+  margin: 0 auto 22px;
   border-radius: 16px;
   background: #183b2a;
   color: #c6f36b;
   font-size: 30px;
 }
+
+/* Heading */
 
 .eyebrow {
   color: #7cae36;
@@ -40,6 +50,7 @@
 h1 {
   color: #183b2a;
   font-size: 30px;
+  font-weight: 800;
   margin: 15px 0;
 }
 
@@ -49,10 +60,13 @@ h1 {
   line-height: 1.7;
 }
 
+/* User Details */
+
 .user-details {
   margin: 28px 0;
-  padding: 18px;
+  padding: 18px 22px;
   background: #f6f8f3;
+  border: 1px solid #edf1e9;
   border-radius: 12px;
   text-align: left;
 }
@@ -61,7 +75,11 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 10px 0;
+  padding: 11px 0;
+}
+
+.user-details div + div {
+  border-top: 1px solid #e8ede4;
 }
 
 .user-details span {
@@ -75,62 +93,151 @@ h1 {
   overflow-wrap: anywhere;
 }
 
+/* Information Text */
+
 .coming-soon {
   color: #78847b;
   font-size: 13px;
   line-height: 1.6;
-  margin-bottom: 25px;
+  margin-bottom: 22px;
 }
+
+/* Navigation Buttons */
+
+.transactions-link,
+.budgets-link,
+.dashboard-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 11px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.transactions-link {
+  background: #214c39;
+  color: #ffffff;
+  margin-top: 15px;
+}
+
+.transactions-link:hover {
+  background: #79a83f;
+  color: #173c2f;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(121, 168, 63, 0.2);
+}
+
+.budgets-link {
+  background: #79a83f;
+  color: #193d30;
+  margin-top: 15px;
+}
+
+.budgets-link:hover {
+  background: #8dbb50;
+  color: #193d30;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(121, 168, 63, 0.2);
+}
+
+.dashboard-link {
+  background: #183b2a;
+  color: #ffffff;
+  margin-top: 15px;
+}
+
+.dashboard-link:hover {
+  background: #28563c;
+  color: #c6f36b;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(24, 59, 42, 0.15);
+}
+
+/* Navigation Button Container */
+
+.navigation-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+/* Logout Button */
 
 .logout-button {
   width: 100%;
   height: 48px;
+  margin-top: 25px;
   border: none;
   border-radius: 9px;
   background: #183b2a;
-  color: white;
+  color: #ffffff;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 .logout-button:hover {
   background: #28563c;
 }
 
-@media (max-width: 480px) {
+/* Keyboard Accessibility */
+
+.transactions-link:focus-visible,
+.budgets-link:focus-visible,
+.dashboard-link:focus-visible,
+.logout-button:focus-visible {
+  outline: 3px solid #a5d65b;
+  outline-offset: 3px;
+}
+
+/* Responsive Design */
+
+@media (max-width: 600px) {
+  .welcome-page {
+    padding: 18px;
+  }
+
   .welcome-card {
-    padding: 30px 22px;
+    padding: 32px 22px;
+  }
+
+  h1 {
+    font-size: 25px;
+  }
+
+  .user-details {
+    padding: 15px;
+  }
+
+  .navigation-links {
+    flex-direction: column;
+  }
+
+  .transactions-link,
+  .budgets-link,
+  .dashboard-link {
+    width: 100%;
   }
 }
 
-.transactions-link {
-  display: inline-block;
-  padding: 12px 20px;
-  margin-top: 15px;
-  background: #214c39;
-  color: white;
-  text-decoration: none;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: 0.2s ease;
-
-  &:hover {
-    background: #79a83f;
-    color: #173c2f;
+@media (max-width: 360px) {
+  .welcome-card {
+    padding: 26px 17px;
   }
-}
 
-.budgets-link {
-  display: inline-block;
-  padding: 12px 20px;
-  border-radius: 8px;
-  background: #79a83f;
-  color: #193d30;
-  font-weight: 650;
-  text-decoration: none;
-  transition: background 0.2s;
-
-  &:hover {
-    background: #8dbb50;
+  h1 {
+    font-size: 22px;
   }
 }

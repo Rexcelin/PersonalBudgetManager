@@ -4,6 +4,8 @@ import { Transactions } from './features/transactions/transactions/transactions'
 
 import { Budgets } from './features/budgets/budgets/budgets';
 
+import { Dashboard } from './features/dashboard/dashboard/dashboard';
+
 export const routes: Routes = [
   {
     path: '',
@@ -30,6 +32,8 @@ export const routes: Routes = [
     path: 'budgets',
     component: Budgets,
   },
+  { path: 'dashboard', 
+    component: Dashboard },
   {
     path: '**',
     redirectTo: 'login',
